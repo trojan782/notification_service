@@ -1,0 +1,53 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*/venv
+
+*__
+# Terraform crash log files
+crash.log
+*.lock.hcl
+# Terraform variable override files
+*.tfvars
+*.tfvars.json
+
+# Terraform plan files
+*.tfplan
+
+# Directory for local Terraform modules
+.terraform/
+
+# Override files for local use only
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include override files you do not want to ignore
+!example_override.tf
+
+# .terraformrc file containing user-specific configuration
+.terraformrc
+.terraformrc.json
+
+# Directory for Terraform provider plugins
+.terraform.d/
+
+# Sensitive files
+.env
+*.pem
+*.key
+*.cer
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+
+# Visual Studio Code
+.vscode/
+.history/
+
+
+# Mac
+.DS_Store
