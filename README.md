@@ -2,7 +2,7 @@
 
 A simple application to build a near real-time notifier using AWS services; SQS, SNS, and DynamoDB. This application is designed to send notifications/messages to various subscribed endpoints in ~1sec, ensuring notifications are processed and delivered instantly with minimal latency.
 
-![Notifier Diagram](./imgs/image-5.png)
+![Notifier Diagram](./imgs/image-4.png)
 
 
 ### Features
