@@ -9,7 +9,7 @@ class User(BaseModel):
 
 class Notification(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
-    timestamp: str = Field(default_factory=lambda: datetime.isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     message: str
 
 
