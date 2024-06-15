@@ -1,10 +1,22 @@
-import boto3
 import re
+import os
+import boto3
+from dotenv import load_dotenv
 from models import User, Notification
 from fastapi import HTTPException
 from utils import get_subcription_by_topic
+from posthog import Posthog
+import uuid
 
-TOPIC_ARN = 'arn:aws:sns:eu-west-1:935097633081:all'
+load_dotenv()
+
+TOPIC_ARN = os.getenv('TOPIC_ARN')
+queue_name = os.getenv('QUEUE_NAME')
+posthog_api_key = os.getenv('POSTHOG_APIKEY')
+posthog_host = os.getenv('POSTHOG_HOST')
+
+# posthog initalization
+posthog = Posthog(project_api_key=posthog_api_key, host=posthog_host)
 
 sqs = boto3.client('sqs')
 sns = boto3.client('sns')
@@ -13,13 +25,14 @@ queue = sqs.get_queue_url(QueueName='app_queue')
 dynamodb = boto3.resource('dynamodb')
 
 user_table = dynamodb.Table('user_table')
-notification_table = dynamodb.Table('notification_usertable')
+notification_table = dynamodb.Table('notification_table')
 
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 
 def create_user(user: User):
     try:
+        user_id = str(uuid.uuid4())
         user_data = user.dict()
         if not re.fullmatch(regex, user_data['email']):
             raise HTTPException(status_code=400, detail="Please enter a valid email address.")
@@ -29,6 +42,7 @@ def create_user(user: User):
             return {"message": "user already exists"}
         else:
             user_table.put_item(Item=user_data)
+            posthog.capture(user_id, "tried to create a user")
         return {"message": "User created successfully", "user": user_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -43,9 +57,12 @@ def get_user_events(email: str):
         raise HTTPException(status_code=500, detail=str(e))
     
 def get_all_users():
+    user_id = str(uuid.uuid4())
     try:
         response = user_table.scan()
+        posthog.capture(user_id, "tried to list all users")
         return {"users": response['Items']}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -59,10 +76,6 @@ def create_notification(notification: Notification):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
-def create_event():
-    pass
-
 def subcribe_to_event(endpoint: str):
     try:
         if not re.fullmatch(regex, endpoint):

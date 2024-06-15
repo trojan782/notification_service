@@ -1,9 +1,10 @@
+import os
 import boto3
 
 # from crud import get_all_users
 sns = boto3.client('sns')
 
-topic_arn = 'arn:aws:sns:eu-west-1:935097633081:all'
+topic_arn = os.getenv('TOPIC_ARN')
 
 def get_subcription_by_topic(topic_arn):
     response = sns.list_subscriptions_by_topic(TopicArn=topic_arn)
