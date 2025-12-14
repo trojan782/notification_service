@@ -1,7 +1,7 @@
 import os
 import boto3
 
-# Helper functions were are supposed to be here...
+# all helper functions come here
 
 sns = boto3.client('sns')
 
